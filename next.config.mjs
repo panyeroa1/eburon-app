@@ -5,7 +5,7 @@ const nextConfig = {
     OLLAMA_URL: process.env.OLLAMA_URL, // ✅ expose the env variable
   },
   webpack: (config, { isServer }) => {
-    // Fixes npm packages that depend on `fs` module
+    // Fixes npm packages that depend on fs module
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback, // don't drop other fallbacks
