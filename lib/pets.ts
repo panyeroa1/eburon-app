@@ -1,8 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-// ✅ Hardcoded absolute path to project-level data directory
-const filePath = '/home/ubuntu/m-nextjs-ollama-llm-ui/data/pets.json';
+const filePath = process.env.PETS_JSON_PATH || path.join(process.cwd(), 'data', 'pets.json');
 
 export function loadPets() {
   try {
@@ -24,19 +23,27 @@ export function loadPets() {
   }
 }
 
-export function savePet(pet: any) {
+export function removePetByName(name: string) {
+  const pets = loadPets();
+  const updated = pets.filter(p => p.name.toLowerCase() !== name.toLowerCase());
+  fs.writeFileSync(filePath, JSON.stringify(updated, null, 2), 'utf-8');
+}
+
+export function savePet(pet: { name: string; size: string; personality: string; animalType: string; imageUrl?: string }) {
   try {
     const pets = loadPets();
-    console.log('💾 Pet to save:', pet);
-    pets.push(pet);
-    console.log('📦 Full pets list:', pets);
+    pets.push({
+      name: pet.name,
+      size: pet.size,
+      personality: pet.personality,
+      animalType: pet.animalType,
+      imageUrl: pet.imageUrl || '',
+    });
     fs.writeFileSync(filePath, JSON.stringify(pets, null, 2), 'utf-8');
-    console.log('✅ Pet successfully written to pets.json');
   } catch (err) {
     console.error('❌ Failed to write pets.json:', err);
   }
 }
 
-// For adopter matching
+// For compatibility
 export { loadPets as getAllPets };
-

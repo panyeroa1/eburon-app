@@ -9,17 +9,25 @@ export async function POST(req: NextRequest) {
     const name = formData.get('name') as string | null;
     const size = formData.get('size') as string | null;
     const personality = formData.get('personality') as string | null;
+    const animalType = formData.get('animalType') as string | null;
     const imageFile = formData.get('image') as File | null;
 
-    if (!name || !size || !personality || !imageFile) {
-      console.warn('Missing one or more fields:', { name, size, personality, imageFile });
+    if (!name || !size || !personality || !animalType || !imageFile) {
+      console.warn('Missing one or more fields:', { name, size, personality, animalType, imageFile });
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     const buffer = Buffer.from(await imageFile.arrayBuffer());
     const imageUrl = await uploadToS3(imageFile.name, buffer);
 
-    const pet = { name, size, personality, image: imageUrl };
+    const pet = {
+      name,
+      size,
+      personality,
+      animalType,
+      imageUrl,
+    };
+
     savePet(pet);
 
     return NextResponse.json({ message: 'Pet saved', pet });
@@ -31,4 +39,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

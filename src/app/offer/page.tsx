@@ -7,8 +7,12 @@ export default function OfferPet() {
     name: '',
     size: '',
     personality: '',
+    animalType: '',
     image: null as File | null,
   });
+
+  // ✅ Define your common animal types here
+  const commonAnimals = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Hamster', 'Fish', 'Reptile', 'Other'];
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,6 +20,7 @@ export default function OfferPet() {
     data.append('name', form.name);
     data.append('size', form.size);
     data.append('personality', form.personality);
+    data.append('animalType', form.animalType);
     if (form.image) {
       data.append('image', form.image);
     }
@@ -50,6 +55,19 @@ export default function OfferPet() {
         <option value="Medium">Medium</option>
         <option value="Large">Large</option>
       </select>
+      <input
+        type="text"
+        placeholder="Animal Type (e.g. Dog, Cat)"
+        list="animal-types"
+        className="border p-2 w-full"
+        onChange={(e) => setForm({ ...form, animalType: e.target.value })}
+        required
+      />
+      <datalist id="animal-types">
+        {commonAnimals.map((animal) => (
+          <option key={animal} value={animal} />
+        ))}
+      </datalist>
       <input
         type="text"
         placeholder="Personality"
