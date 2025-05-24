@@ -53,10 +53,10 @@ jobs:
 
             cd m-nextjs-ollama-llm-ui
 
-            # Ensure pets.json exists and is writable
+            # Ensure pets.json exists but don't overwrite existing data
             mkdir -p data
             touch data/pets.json
-            echo '[]' > data/pets.json
+            [ -f data/pets.json ] || echo '[]' > data/pets.json
             chmod 664 data/pets.json
 
             # Set up environment file
