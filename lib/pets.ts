@@ -9,7 +9,7 @@ type Pet = {
   imageUrl: string;
 };
 
-const filePath = process.env.PETS_JSON_PATH || path.join(process.cwd(), 'data', 'pets.json');
+const filePath = path.join(process.cwd(), 'data', 'pets.json');
 
 export function loadPets(): Pet[] {
   try {
