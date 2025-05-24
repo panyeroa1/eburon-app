@@ -1,16 +1,16 @@
 [
   {
-    "name": "Lucky",
+    "name": "sese",
     "size": "Small",
     "personality": "joyful",
-    "animalType": "dog",
-    "imageUrl": "https://m-adoption-images.s3.us-east-2.amazonaws.com/pets/1747764635055_WhatsApp+Image+2025-05-06+at+22.37.16.jpeg"
+    "animalType": "Bird",
+    "imageUrl": "https://m-adoption-images.s3.us-east-2.amazonaws.com/pets/1748120012317_bird.jpeg"
   },
   {
-    "name": "dog2",
+    "name": "sese",
     "size": "Small",
     "personality": "joyful",
-    "animalType": "dog",
-    "image": "https://m-adoption-images.s3.us-east-2.amazonaws.com/pets/1747770374683_test1.jpeg"
+    "animalType": "Bird",
+    "imageUrl": "https://m-adoption-images.s3.us-east-2.amazonaws.com/pets/1748120014223_bird.jpeg"
   }
 ]
