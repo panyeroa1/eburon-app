@@ -22,7 +22,7 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            # Update and install dependencies
+            # Install system dependencies
             sudo apt update && sudo apt install -y git curl unzip
 
             # Install Node.js 18 if not present
@@ -31,7 +31,7 @@ jobs:
               sudo apt install -y nodejs
             fi
 
-            # Install Ollama if not installed
+            # Install Ollama if missing
             if ! command -v ollama &> /dev/null; then
               curl -fsSL https://ollama.com/install.sh | sh
             fi
@@ -40,7 +40,7 @@ jobs:
             mkdir -p ~/.ollama
             echo 'host = "0.0.0.0"' > ~/.ollama/config
 
-            # Start Ollama server
+            # Start Ollama in background
             pkill ollama || true
             nohup ollama serve > ollama.log 2>&1 &
 
@@ -59,16 +59,20 @@ jobs:
             echo '[]' > data/pets.json
             chmod 664 data/pets.json
 
-            # Set environment variables
+            # Set up environment file
             echo 'OLLAMA_URL=http://${{ secrets.EC2_HOST }}:11434' > .env
             echo 'NODE_ENV=production' >> .env
             echo 'PETS_JSON_PATH=./data/pets.json' >> .env
 
-            # Install dependencies and build app
+            # Install packages and build app
             npm ci
             npm run build
 
-            # Restart systemd service if defined
+            # Ensure systemd service uses 'npm run start'
+            sed -i 's/npm run dev/npm run start/' nextjs-ollama-llm-ui.service
+
+            # Copy and enable the service
+            sudo cp nextjs-ollama-llm-ui.service /etc/systemd/system/nextjs-ollama-llm-ui.service
             sudo systemctl daemon-reload
             sudo systemctl enable nextjs-ollama-llm-ui.service
             sudo systemctl restart nextjs-ollama-llm-ui.service
