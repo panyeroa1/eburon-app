@@ -1,0 +1,18 @@
+[Unit]
+Description=Next.js Ollama LLM UI Service
+After=network.target
+
+[Service]
+WorkingDirectory=/home/ubuntu/m-nextjs-ollama-llm-ui
+ExecStart=/usr/bin/npm run dev
+Environment=OLLAMA_URL=http://${{ secrets.EC2_HOST }}:11434
+User=ubuntu
+Group=ubuntu
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=nextjs-ollama-llm-ui
+
+[Install]
+WantedBy=multi-user.target

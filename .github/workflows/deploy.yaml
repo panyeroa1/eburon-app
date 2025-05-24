@@ -10,42 +10,57 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Set up SSH key
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
 
-    - name: Deploy to EC2
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-          sudo apt update && sudo apt install -y git curl unzip
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            # Update system
+            sudo apt update && sudo apt install -y git curl unzip
 
-          # Install Node.js
-          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-          sudo apt install -y nodejs
+            # Install Node.js 18
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt install -y nodejs
 
-          # Install Ollama
-          curl -fsSL https://ollama.com/install.sh | sh
+            # Install Ollama if not installed
+            if ! command -v ollama &> /dev/null; then
+              curl -fsSL https://ollama.com/install.sh | sh
+            fi
 
-          # Clone or update the repo
-          if [ ! -d m-nextjs-ollama-llm-ui ]; then
-            git clone https://github.com/MaisaSh99/m-nextjs-ollama-llm-ui.git
-          else
-            cd m-nextjs-ollama-llm-ui && git pull
-          fi
+            # Configure Ollama to listen on all IPs
+            mkdir -p ~/.ollama
+            echo 'host = "0.0.0.0"' > ~/.ollama/config
 
-          cd m-nextjs-ollama-llm-ui
+            # Start Ollama server
+            pkill ollama || true
+            nohup ollama serve > ollama.log 2>&1 &
 
-          # Install dependencies
-          npm install
+            # Clone or update repo
+            if [ ! -d m-nextjs-ollama-llm-ui ]; then
+              git clone https://github.com/MaisaSh99/m-nextjs-ollama-llm-ui.git
+            else
+              cd m-nextjs-ollama-llm-ui && git pull
+            fi
 
-          # Build project (optional)
-          npm run build
+            cd m-nextjs-ollama-llm-ui
 
-          # Run in production
-          npm run start &
-        EOF
+            # Set environment variables
+            echo 'OLLAMA_URL=http://${{ secrets.EC2_HOST }}:11434' > .env
+            echo 'NODE_ENV=production' >> .env
+
+            # Install dependencies and build
+            npm ci
+            npm run build
+
+            # Restart the systemd service
+            sudo systemctl daemon-reload
+            sudo systemctl enable nextjs-ollama-llm-ui.service
+            sudo systemctl restart nextjs-ollama-llm-ui.service
+          EOF
