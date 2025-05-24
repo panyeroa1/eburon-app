@@ -53,7 +53,7 @@ export function Sidebar({
   return (
     <div
       data-collapsed={isCollapsed}
-      className="relative justify-between group lg:bg-accent/20 lg:dark:bg-card/35 flex flex-col h-full gap-4 p-2 data-[collapsed=true]:p-2 "
+      className="relative justify-between group flex flex-col h-full gap-4 p-2 data-[collapsed=true]:p-2 bg-pink-50/80 border-r border-pink-100 rounded-r-2xl shadow-sm"
     >
       <div className=" flex flex-col justify-between p-2 max-h-fit overflow-y-auto">
         <Button
@@ -64,7 +64,7 @@ export function Sidebar({
             }
           }}
           variant="ghost"
-          className="flex justify-between w-full h-14 text-sm xl:text-lg font-normal items-center "
+          className="flex justify-between w-full h-14 text-sm xl:text-lg font-normal items-center rounded-xl bg-white/80 hover:bg-pink-100 transition-colors shadow"
         >
           <div className="flex gap-3 items-center ">
             {!isCollapsed && !isMobile && (
@@ -101,7 +101,7 @@ export function Sidebar({
                           id === chatId,
                         [buttonVariants({ variant: "ghost" })]: id !== chatId,
                       },
-                      "flex justify-between w-full h-14 text-base font-normal items-center "
+                      "flex justify-between w-full h-14 text-base font-normal items-center rounded-xl bg-white/70 hover:bg-pink-100 transition-colors shadow-sm"
                     )}
                   >
                     <div className="flex gap-3 items-center truncate">
@@ -166,7 +166,7 @@ export function Sidebar({
         </div>
       </div>
 
-      <div className="justify-end px-2 py-2 w-full border-t">
+      <div className="justify-end px-2 py-2 w-full border-t border-pink-100 bg-pink-50/60 rounded-b-xl">
         <UserSettings />
       </div>
     </div>

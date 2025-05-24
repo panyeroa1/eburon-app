@@ -7,7 +7,7 @@ import { Button, ButtonProps } from "../button";
 
 // ChatBubble
 const chatBubbleVariant = cva(
-  "flex gap-2 max-w-[80%] items-end relative group",
+  "flex gap-3 max-w-[85%] items-end relative group",
   {
     variants: {
       variant: {
@@ -82,12 +82,12 @@ const ChatBubbleAvatar: React.FC<ChatBubbleAvatarProps> = ({
 );
 
 // ChatBubbleMessage
-const chatBubbleMessageVariants = cva("p-4", {
+const chatBubbleMessageVariants = cva("p-4 shadow-sm transition-all duration-200", {
   variants: {
     variant: {
       received:
-        "bg-secondary text-secondary-foreground rounded-r-lg rounded-tl-lg",
-      sent: "bg-primary text-primary-foreground rounded-l-lg rounded-tr-lg",
+        "bg-white text-gray-800 rounded-2xl rounded-tl-sm border border-pink-100 hover:bg-pink-50/50",
+      sent: "bg-pink-500 text-white rounded-2xl rounded-tr-sm hover:bg-pink-600",
     },
     layout: {
       default: "",

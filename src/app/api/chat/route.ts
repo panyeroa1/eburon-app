@@ -2,6 +2,13 @@ import { streamText } from 'ai';
 import { createOllama } from 'ollama-ai-provider';
 import { loadPets, removePetByName } from '../../../../lib/pets';
 
+interface Pet {
+  name: string;
+  animalType: string;
+  size: string;
+  personality: string;
+}
+
 export async function POST(req: Request) {
   try {
     const { messages, selectedModel } = await req.json();
@@ -13,12 +20,11 @@ export async function POST(req: Request) {
 
     const pets = loadPets();
 
-    // ✅ Case-insensitive match
-    const previouslySuggestedPet = pets.find(p =>
+    const previouslySuggestedPet = pets.find((p: Pet) =>
       lastAssistantMsg.toLowerCase().includes(p.name.toLowerCase())
     );
 
-    // ✅ Stream thank-you response if user accepts adoption
+    // If user accepted a pet
     if (previouslySuggestedPet && lastUserMsg.includes('yes')) {
       removePetByName(previouslySuggestedPet.name);
 
@@ -27,7 +33,7 @@ export async function POST(req: Request) {
         messages: [
           {
             role: 'assistant',
-            content: `🎉 thank you for adopting **${previouslySuggestedPet.name}**! Thank you for giving them a loving home.`
+            content: `🎉 Thank you for adopting **${previouslySuggestedPet.name}**! You're giving them a wonderful home.`
           }
         ]
       });
@@ -35,36 +41,37 @@ export async function POST(req: Request) {
       return result.toDataStreamResponse();
     }
 
+    const s3BaseUrl = 'https://m-adoption-images.s3.amazonaws.com';
+
     const prompt = `
-You are a friendly assistant for a pet adoption platform.
+You are a friendly assistant on a pet adoption platform.
 
 ${isFirstMessage ? `
-Start by greeting the user warmly and ask them to describe:
-1. What kind of place they live in (e.g., small apartment, house with yard).
-2. What type of pet they're looking for (e.g., dog, calm, playful, cat, etc).
+Greet the user warmly and ask:
+1. What kind of home do you live in? (e.g., small apartment, house with yard)
+2. What type of pet are you looking for? (e.g., dog, cat, playful, calm)
 ` : `
 Choose ONE suitable pet from this list based on the user's needs:
 
 ${pets.length > 0
-  ? pets.map(p => `- Name: ${p.name}, Type: ${p.animalType}, Size: ${p.size}, Personality: ${p.personality}, Image: ${p.imageUrl}`).join('\n')
-  : '⚠️ The list is currently empty.'}
+  ? pets.map((p: Pet) =>
+      `- Name: ${p.name}, Type: ${p.animalType}, Size: ${p.size}, Personality: ${p.personality}, Image: ${s3BaseUrl}/${p.name.toLowerCase().replace(/\\s+/g, '-')}.jpg`
+    ).join('\n')
+  : '⚠️ No pets are currently available.'}
 
-⚠️ STRICT INSTRUCTIONS:
-- Only suggest a pet from the list above.
-- DO NOT invent pets or names.
-- DO NOT suggest pets if the list is empty.
-- Only say: "Sorry, no matches available." if the list is completely empty.
-- If pets are listed, choose ONE of them.
-- NEVER reject a pet that is listed above.
-- Respond using this format:
-  **Name**: <pet name>
-  **Size**: <size>
-  **Personality**: <personality>
-  ![pet](<imageUrl>)
-  Would you like to adopt this animal?
+📌 Instructions:
+- Only suggest ONE real pet from the list above.
+- Do NOT make up any pets.
+- If the list is empty, say: "Sorry, no matches available right now."
+- Format your reply like this:
 
-❌ Do NOT provide care tips or post-adoption advice.
-`}`.trim();
+**Name**: <pet name>
+**Size**: <size>
+**Personality**: <personality>
+![pet](https://m-adoption-images.s3.amazonaws.com/<pet-name-lowercase-with-dashes>.jpg)
+Would you like to adopt this animal?
+`}
+`.trim();
 
     const result = await streamText({
       model: ollama(selectedModel || 'llama3.2:1b'),

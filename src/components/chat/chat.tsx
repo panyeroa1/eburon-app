@@ -116,64 +116,87 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
   };
 
   return (
-    <div className="flex flex-col w-full max-w-3xl h-full">
-      <ChatTopbar
-        isLoading={isLoading}
-        chatId={id}
-        messages={messages}
-        setMessages={setMessages}
-      />
-
-      {messages.length === 0 ? (
-        <div className="flex flex-col h-full w-full items-center gap-4 justify-center">
-          <Image
-            src="/ollama.png"
-            alt="AI"
-            width={40}
-            height={40}
-            className="h-16 w-14 object-contain dark:invert"
-          />
-          <p className="text-center text-base text-muted-foreground">
-            How can I help you today?
-          </p>
-          <ChatBottombar
-            input={input}
-            handleInputChange={handleInputChange}
-            handleSubmit={onSubmit}
-            isLoading={isLoading}
-            stop={handleStop}
-            setInput={setInput}
-          />
+    <div className="flex flex-col w-full max-w-3xl h-full mx-auto py-8 px-4 md:px-6">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">🐶 🐱 🐰 🐦</span>
+          <h1 className="text-2xl font-bold text-pink-600">PetMatch Chat</h1>
         </div>
-      ) : (
-        <>
-          <ChatList
-            messages={messages}
-            isLoading={isLoading}
-            loadingSubmit={loadingSubmit}
-            reload={async () => {
-              removeLatestMessage();
+        <a
+          href="/offer"
+          className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-5 py-2 rounded-full shadow-sm transition-all duration-200 hover:scale-105"
+        >
+          Offer a Pet
+        </a>
+      </div>
+      <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg flex-1 flex flex-col min-h-0">
+        <ChatTopbar
+          isLoading={isLoading}
+          chatId={id}
+          messages={messages}
+          setMessages={setMessages}
+        />
 
-              const requestOptions: ChatRequestOptions = {
-                body: {
-                  selectedModel: selectedModel,
-                },
-              };
+        {messages.length === 0 ? (
+          <div className="flex flex-col h-full w-full items-center gap-6 justify-center bg-gradient-to-b from-orange-50 to-pink-50 rounded-xl p-8">
+            <div className="w-24 h-24 rounded-full bg-white/80 p-4 shadow-lg flex items-center justify-center">
+              <span className="text-6xl">🐾</span>
+            </div>
+            <h1 className="text-3xl font-bold text-pink-600 text-center">
+              Welcome to PetMatch
+            </h1>
+            <p className="text-xl text-center text-gray-500 max-w-md">
+              Find Your Perfect Companion
+            </p>
+            <p className="text-center text-base text-gray-500 max-w-md">
+              Tell us about your living situation and what kind of pet you're looking for.<br />
+              We'll help you find your perfect match!
+            </p>
+            <div className="w-full max-w-2xl px-4">
+              <ChatBottombar
+                input={input}
+                handleInputChange={handleInputChange}
+                handleSubmit={onSubmit}
+                isLoading={isLoading}
+                stop={handleStop}
+                setInput={setInput}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col flex-1 min-h-0">
+            <div className="flex-1 overflow-hidden">
+              <ChatList
+                messages={messages}
+                isLoading={isLoading}
+                loadingSubmit={loadingSubmit}
+                reload={async () => {
+                  removeLatestMessage();
 
-              setLoadingSubmit(true);
-              return reload(requestOptions);
-            }}
-          />
-          <ChatBottombar
-            input={input}
-            handleInputChange={handleInputChange}
-            handleSubmit={onSubmit}
-            isLoading={isLoading}
-            stop={handleStop}
-            setInput={setInput}
-          />
-        </>
-      )}
+                  const requestOptions: ChatRequestOptions = {
+                    body: {
+                      selectedModel: selectedModel,
+                    },
+                  };
+                  setLoadingSubmit(true);
+                  const result = await reload(requestOptions);
+                  return result;
+                }}
+              />
+            </div>
+            <div className="mt-4 p-4">
+              <ChatBottombar
+                input={input}
+                handleInputChange={handleInputChange}
+                handleSubmit={onSubmit}
+                isLoading={isLoading}
+                stop={handleStop}
+                setInput={setInput}
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

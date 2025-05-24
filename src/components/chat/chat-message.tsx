@@ -61,6 +61,30 @@ function ChatMessage({ message, isLast, isLoading, reload }: ChatMessageProps) {
     setTimeout(() => setIsCopied(false), 1500);
   };
 
+  const renderPetImage = () => {
+    // Check if this is a pet match message by looking for the specific format
+    const isPetMatch = cleanContent.includes("**Name**:") && cleanContent.includes("Would you like to adopt this animal?");
+    
+    if (isPetMatch) {
+      // Extract the image URL from the markdown syntax
+      const imageMatch = cleanContent.match(/!\[pet\]\((.*?)\)/);
+      if (imageMatch && imageMatch[1]) {
+        return (
+          <div className="mt-4">
+            <Image
+              src={imageMatch[1]}
+              alt="Pet for adoption"
+              width={300}
+              height={300}
+              className="rounded-lg shadow-md object-cover"
+            />
+          </div>
+        );
+      }
+    }
+    return null;
+  };
+
   const renderAttachments = () => (
     <div className="flex gap-2">
       {message.experimental_attachments
@@ -152,6 +176,7 @@ function ChatMessage({ message, isLast, isLoading, reload }: ChatMessageProps) {
           {renderThinkingProcess()}
           {renderAttachments()}
           {renderContent()}
+          {renderPetImage()}
           {renderActionButtons()}
         </ChatBubbleMessage>
       </ChatBubble>

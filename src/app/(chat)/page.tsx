@@ -38,10 +38,12 @@ export default function Home() {
         />
         <DialogContent className="flex flex-col space-y-4">
           <DialogHeader className="space-y-2">
-            <DialogTitle>Welcome to Ollama!</DialogTitle>
-            <DialogDescription>
-              Enter your name to get started. This is just to personalize your
-              experience.
+            <DialogTitle className="text-2xl font-bold text-primary">
+              🐾 Welcome to PetMatch!
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Let's get to know you better so we can help find your perfect furry friend.
+              Enter your name to get started.
             </DialogDescription>
             <UsernameForm setOpen={setOpen} />
           </DialogHeader>

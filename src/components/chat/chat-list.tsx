@@ -25,8 +25,8 @@ export default function ChatList({
   reload,
 }: ChatListProps) {
   return (
-    <div className="flex-1 w-full overflow-y-auto">
-      <ChatMessageList>
+    <div className="h-full overflow-hidden">
+      <ChatMessageList className="h-full">
         {messages.map((message, index) => (
           <ChatMessage
             key={message.id || index}

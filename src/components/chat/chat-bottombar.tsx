@@ -77,11 +77,11 @@ export default function ChatBottombar({
   }, [inputRef]);
 
   return (
-    <div className="px-4 pb-7 flex justify-between w-full items-center relative ">
+    <div className="px-4 pb-7 flex justify-between w-full items-center relative">
       <AnimatePresence initial={false}>
         <form
           onSubmit={handleSubmit}
-          className="w-full items-center flex flex-col  bg-accent dark:bg-card rounded-lg "
+          className="w-full items-center flex flex-col bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-pink-100"
         >
           <ChatInput
             value={isListening ? (transcript.length ? transcript : "") : input}
@@ -90,7 +90,7 @@ export default function ChatBottombar({
             onChange={handleInputChange}
             name="message"
             placeholder={!isListening ? "Enter your prompt here" : "Listening"}
-            className="max-h-40 px-6 pt-6 border-0 shadow-none bg-accent rounded-lg text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed dark:bg-card"
+            className="max-h-40 px-6 pt-6 border-0 shadow-none bg-transparent rounded-2xl text-sm text-gray-700 placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed"
           />
 
           <div className="flex w-full items-center p-2">
@@ -100,7 +100,7 @@ export default function ChatBottombar({
                 <MultiImagePicker disabled onImagesPick={setBase64Images} />
                 <div>
                   <Button
-                    className="shrink-0 rounded-full"
+                    className="shrink-0 rounded-full hover:bg-pink-100 transition-all duration-200"
                     variant="ghost"
                     size="icon"
                     type="button"
@@ -109,7 +109,7 @@ export default function ChatBottombar({
                     <Mic className="w-5 h-5" />
                   </Button>
                   <Button
-                    className="shrink-0 rounded-full"
+                    className="shrink-0 rounded-full hover:bg-pink-100 transition-all duration-200"
                     variant="ghost"
                     size="icon"
                     type="submit"
@@ -132,10 +132,10 @@ export default function ChatBottombar({
                 <div>
                   {/* Microphone button with animation when listening */}
                   <Button
-                    className={`shrink-0 rounded-full ${
+                    className={`shrink-0 rounded-full transition-all duration-200 ${
                       isListening
-                        ? "relative bg-blue-500/30 hover:bg-blue-400/30"
-                        : ""
+                        ? "relative bg-pink-500/30 hover:bg-pink-400/30"
+                        : "hover:bg-pink-100"
                     }`}
                     variant="ghost"
                     size="icon"
@@ -145,13 +145,13 @@ export default function ChatBottombar({
                   >
                     <Mic className="w-5 h-5" />
                     {isListening && (
-                      <span className="animate-pulse absolute h-[120%] w-[120%] rounded-full bg-blue-500/30" />
+                      <span className="animate-pulse absolute h-[120%] w-[120%] rounded-full bg-pink-500/30" />
                     )}
                   </Button>
 
                   {/* Send button */}
                   <Button
-                    className="shrink-0 rounded-full"
+                    className="shrink-0 rounded-full hover:bg-pink-100 transition-all duration-200"
                     variant="ghost"
                     size="icon"
                     type="submit"
