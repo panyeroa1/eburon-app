@@ -7,7 +7,7 @@ WorkingDirectory=/home/ubuntu/m-nextjs-ollama-llm-ui
 ExecStart=/usr/bin/npm start
 Environment=NODE_ENV=production
 Environment=OLLAMA_URL=http://3.132.84.78:11434
-Environment=PETS_JSON_PATH=/home/ubuntu/PycharmProjects/m-nextjs-ollama-llm-ui/data/pets.json
+Environment=PETS_JSON_PATH=/home/ubuntu/m-nextjs-ollama-llm-ui/data/pets.json
 User=ubuntu
 Group=ubuntu
 Restart=always
