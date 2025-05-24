@@ -4,8 +4,10 @@ After=network.target
 
 [Service]
 WorkingDirectory=/home/ubuntu/m-nextjs-ollama-llm-ui
-ExecStart=/usr/bin/npm run dev
-Environment="NODE_ENV=production" "OLLAMA_URL=http://3.132.84.78:11434"
+ExecStart=/usr/bin/npm start
+Environment=NODE_ENV=production
+Environment=OLLAMA_URL=http://3.132.84.78:11434
+Environment=PETS_JSON_PATH=./data/pets.json
 User=ubuntu
 Group=ubuntu
 Restart=always
