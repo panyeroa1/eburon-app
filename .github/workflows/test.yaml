@@ -1,4 +1,4 @@
-name: Test and Build
+name: Test Build
 
 on:
   pull_request:
@@ -7,29 +7,20 @@ on:
     branches: [ main ]
 
 jobs:
-  test-build:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
 
-      - name: Install dependencies
-        run: npm ci
+    - name: Install dependencies
+      run: npm install
 
-      - name: Create .env file
-        run: |
-          echo "OLLAMA_URL=${{ secrets.OLLAMA_URL }}" >> .env
-          echo "NODE_ENV=production" >> .env
-
-      # Disable lint errors during build to prevent test failure from formatting issues
-      - name: Build project (skip lint)
-        run: npm run build -- --no-lint
-        env:
-          OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
+    - name: Build project
+      run: npm run build
