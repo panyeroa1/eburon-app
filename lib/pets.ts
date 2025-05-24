@@ -11,16 +11,18 @@ type Pet = {
 
 // Get the correct path for both development and production
 function getDataPath() {
-  // In production, use /home/ubuntu/m-nextjs-ollama-llm-ui/data
-  if (process.env.NODE_ENV === 'production') {
-    const prodPath = '/home/ubuntu/m-nextjs-ollama-llm-ui/data/pets.json';
-    console.log('📁 Using production path:', prodPath);
-    return prodPath;
+  const envPath = process.env.PETS_JSON_PATH;
+  if (envPath) {
+    const fullPath = path.isAbsolute(envPath)
+      ? envPath
+      : path.join(process.cwd(), envPath);
+    console.log('📁 Using .env path:', fullPath);
+    return fullPath;
   }
-  // In development, use the local path
-  const devPath = path.join(process.cwd(), 'data', 'pets.json');
-  console.log('📁 Using development path:', devPath);
-  return devPath;
+
+  const fallbackPath = path.join(process.cwd(), 'data', 'pets.json');
+  console.log('📁 Using fallback path:', fallbackPath);
+  return fallbackPath;
 }
 
 const filePath = getDataPath();
