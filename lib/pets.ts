@@ -9,10 +9,20 @@ type Pet = {
   imageUrl: string;
 };
 
-const filePath = path.join(process.cwd(), 'data', 'pets.json');
+// Get the correct path for both development and production
+function getDataPath() {
+  // In production, use /home/ubuntu/m-nextjs-ollama-llm-ui/data
+  if (process.env.NODE_ENV === 'production') {
+    return '/home/ubuntu/m-nextjs-ollama-llm-ui/data/pets.json';
+  }
+  // In development, use the local path
+  return path.join(process.cwd(), 'data', 'pets.json');
+}
+
+const filePath = getDataPath();
 
 function ensureDataDirectoryExists() {
-  const dataDir = path.join(process.cwd(), 'data');
+  const dataDir = path.dirname(filePath);
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
   }
