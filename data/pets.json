@@ -1,16 +1,1 @@
-[
-  {
-    "name": "sese",
-    "size": "Small",
-    "personality": "joyful",
-    "animalType": "Bird",
-    "imageUrl": "https://m-adoption-images.s3.us-east-2.amazonaws.com/pets/1748120012317_bird.jpeg"
-  },
-  {
-    "name": "sese",
-    "size": "Small",
-    "personality": "joyful",
-    "animalType": "Bird",
-    "imageUrl": "https://m-adoption-images.s3.us-east-2.amazonaws.com/pets/1748120014223_bird.jpeg"
-  }
-]
+[]
