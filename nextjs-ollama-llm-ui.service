@@ -6,6 +6,7 @@ After=network.target
 WorkingDirectory=/home/ubuntu/m-nextjs-ollama-llm-ui
 ExecStart=/usr/bin/npm run dev
 Environment=OLLAMA_URL=http://${{ secrets.EC2_HOST }}:11434
+Environment=NODE_ENV=production
 User=ubuntu
 Group=ubuntu
 Restart=always
