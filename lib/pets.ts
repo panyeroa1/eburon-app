@@ -9,20 +9,15 @@ type Pet = {
   imageUrl: string;
 };
 
-// Get the correct path for both development and production
+// ✅ Get the correct path for both development and production
 function getDataPath() {
   const envPath = process.env.PETS_JSON_PATH;
-  if (envPath) {
-    const fullPath = path.isAbsolute(envPath)
-      ? envPath
-      : path.join(process.cwd(), envPath);
-    console.log('📁 Using .env path:', fullPath);
-    return fullPath;
-  }
+  const fullPath = envPath
+    ? path.resolve(envPath)
+    : path.join(process.cwd(), 'data', 'pets.json');
 
-  const fallbackPath = path.join(process.cwd(), 'data', 'pets.json');
-  console.log('📁 Using fallback path:', fallbackPath);
-  return fallbackPath;
+  console.log('🔍 Final pets.json path being used:', fullPath);
+  return fullPath;
 }
 
 const filePath = getDataPath();
@@ -77,7 +72,7 @@ export function savePet(pet: {
   imageUrl?: string;
 }) {
   try {
-    console.log('📁 Saving pet:', pet);
+    console.log('💾 savePet() called with:', pet);
     ensureDataDirectoryExists();
     const pets = loadPets();
     pets.push({
@@ -87,8 +82,8 @@ export function savePet(pet: {
       animalType: pet.animalType,
       imageUrl: pet.imageUrl || '',
     });
-    console.log('📁 Writing updated pets:', pets);
     fs.writeFileSync(filePath, JSON.stringify(pets, null, 2), 'utf-8');
+    console.log('✅ Pet saved successfully to:', filePath);
   } catch (err) {
     console.error('❌ Failed to write pets.json:', err);
   }

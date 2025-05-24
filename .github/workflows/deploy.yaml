@@ -22,29 +22,23 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            # Install system dependencies
             sudo apt update && sudo apt install -y git curl unzip
 
-            # Install Node.js 18 if not present
             if ! command -v node &> /dev/null; then
               curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
               sudo apt install -y nodejs
             fi
 
-            # Install Ollama if missing
             if ! command -v ollama &> /dev/null; then
               curl -fsSL https://ollama.com/install.sh | sh
             fi
 
-            # Configure Ollama to listen on all IPs
             mkdir -p ~/.ollama
             echo 'host = "0.0.0.0"' > ~/.ollama/config
 
-            # Start Ollama in background
             pkill ollama || true
             nohup ollama serve > ollama.log 2>&1 &
 
-            # Clone or update the app repo
             if [ ! -d m-nextjs-ollama-llm-ui ]; then
               git clone https://github.com/MaisaSh99/m-nextjs-ollama-llm-ui.git
             else
@@ -53,25 +47,21 @@ jobs:
 
             cd m-nextjs-ollama-llm-ui
 
-            # Ensure pets.json exists but don't overwrite existing data
             mkdir -p data
-            touch data/pets.json
-            [ -f data/pets.json ] || echo '[]' > data/pets.json
+            if [ ! -f data/pets.json ]; then
+              echo '[]' > data/pets.json
+            fi
             chmod 664 data/pets.json
 
-            # Set up environment file
-            echo 'OLLAMA_URL=http://${{ secrets.EC2_HOST }}:11434' > .env
-            echo 'NODE_ENV=production' >> .env
-            echo 'PETS_JSON_PATH=./data/pets.json' >> .env
+            echo "OLLAMA_URL=http://${{ secrets.EC2_HOST }}:11434" > .env.local
+            echo "NODE_ENV=production" >> .env.local
+            echo "PETS_JSON_PATH=./data/pets.json" >> .env.local
 
-            # Install packages and build app
             npm ci
             npm run build
 
-            # Ensure systemd service uses 'npm run start'
             sed -i 's/npm run dev/npm run start/' nextjs-ollama-llm-ui.service
 
-            # Copy and enable the service
             sudo cp nextjs-ollama-llm-ui.service /etc/systemd/system/nextjs-ollama-llm-ui.service
             sudo systemctl daemon-reload
             sudo systemctl enable nextjs-ollama-llm-ui.service
