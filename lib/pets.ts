@@ -1,9 +1,17 @@
 import fs from 'fs';
 import path from 'path';
 
+type Pet = {
+  name: string;
+  size: string;
+  personality: string;
+  animalType: string;
+  imageUrl: string;
+};
+
 const filePath = process.env.PETS_JSON_PATH || path.join(process.cwd(), 'data', 'pets.json');
 
-export function loadPets() {
+export function loadPets(): Pet[] {
   try {
     if (!fs.existsSync(filePath)) {
       console.warn('pets.json does not exist. Returning empty list.');
@@ -25,11 +33,17 @@ export function loadPets() {
 
 export function removePetByName(name: string) {
   const pets = loadPets();
-  const updated = pets.filter(p => p.name.toLowerCase() !== name.toLowerCase());
+  const updated = pets.filter((p: Pet) => p.name.toLowerCase() !== name.toLowerCase());
   fs.writeFileSync(filePath, JSON.stringify(updated, null, 2), 'utf-8');
 }
 
-export function savePet(pet: { name: string; size: string; personality: string; animalType: string; imageUrl?: string }) {
+export function savePet(pet: {
+  name: string;
+  size: string;
+  personality: string;
+  animalType: string;
+  imageUrl?: string;
+}) {
   try {
     const pets = loadPets();
     pets.push({
