@@ -1,0 +1,51 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+    - name: Deploy to EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
+          sudo apt update && sudo apt install -y git curl unzip
+
+          # Install Node.js
+          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+          sudo apt install -y nodejs
+
+          # Install Ollama
+          curl -fsSL https://ollama.com/install.sh | sh
+
+          # Clone or update the repo
+          if [ ! -d m-nextjs-ollama-llm-ui ]; then
+            git clone https://github.com/MaisaSh99/m-nextjs-ollama-llm-ui.git
+          else
+            cd m-nextjs-ollama-llm-ui && git pull
+          fi
+
+          cd m-nextjs-ollama-llm-ui
+
+          # Install dependencies
+          npm install
+
+          # Build project (optional)
+          npm run build
+
+          # Run in production
+          npm run start &
+        EOF
