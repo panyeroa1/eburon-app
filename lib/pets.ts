@@ -11,8 +11,16 @@ type Pet = {
 
 const filePath = path.join(process.cwd(), 'data', 'pets.json');
 
+function ensureDataDirectoryExists() {
+  const dataDir = path.join(process.cwd(), 'data');
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+}
+
 export function loadPets(): Pet[] {
   try {
+    ensureDataDirectoryExists();
     if (!fs.existsSync(filePath)) {
       console.warn('pets.json does not exist. Returning empty list.');
       return [];
@@ -32,6 +40,7 @@ export function loadPets(): Pet[] {
 }
 
 export function removePetByName(name: string) {
+  ensureDataDirectoryExists();
   const pets = loadPets();
   const updated = pets.filter((p: Pet) => p.name.toLowerCase() !== name.toLowerCase());
   fs.writeFileSync(filePath, JSON.stringify(updated, null, 2), 'utf-8');
@@ -45,6 +54,7 @@ export function savePet(pet: {
   imageUrl?: string;
 }) {
   try {
+    ensureDataDirectoryExists();
     const pets = loadPets();
     pets.push({
       name: pet.name,

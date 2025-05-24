@@ -130,14 +130,14 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
         </a>
       </div>
       <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg flex-1 flex flex-col min-h-0">
-        <ChatTopbar
-          isLoading={isLoading}
-          chatId={id}
-          messages={messages}
-          setMessages={setMessages}
-        />
+      <ChatTopbar
+        isLoading={isLoading}
+        chatId={id}
+        messages={messages}
+        setMessages={setMessages}
+      />
 
-        {messages.length === 0 ? (
+      {messages.length === 0 ? (
           <div className="flex flex-col h-full w-full items-center gap-6 justify-center bg-gradient-to-b from-orange-50 to-pink-50 rounded-xl p-8">
             <div className="w-24 h-24 rounded-full bg-white/80 p-4 shadow-lg flex items-center justify-center">
               <span className="text-6xl">🐾</span>
@@ -153,49 +153,49 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
               We'll help you find your perfect match!
             </p>
             <div className="w-full max-w-2xl px-4">
-              <ChatBottombar
-                input={input}
-                handleInputChange={handleInputChange}
-                handleSubmit={onSubmit}
-                isLoading={isLoading}
-                stop={handleStop}
-                setInput={setInput}
-              />
+          <ChatBottombar
+            input={input}
+            handleInputChange={handleInputChange}
+            handleSubmit={onSubmit}
+            isLoading={isLoading}
+            stop={handleStop}
+            setInput={setInput}
+          />
             </div>
-          </div>
-        ) : (
+        </div>
+      ) : (
           <div className="flex flex-col flex-1 min-h-0">
             <div className="flex-1 overflow-hidden">
-              <ChatList
-                messages={messages}
-                isLoading={isLoading}
-                loadingSubmit={loadingSubmit}
-                reload={async () => {
-                  removeLatestMessage();
+          <ChatList
+            messages={messages}
+            isLoading={isLoading}
+            loadingSubmit={loadingSubmit}
+            reload={async () => {
+              removeLatestMessage();
 
-                  const requestOptions: ChatRequestOptions = {
-                    body: {
-                      selectedModel: selectedModel,
-                    },
-                  };
-                  setLoadingSubmit(true);
+              const requestOptions: ChatRequestOptions = {
+                body: {
+                  selectedModel: selectedModel,
+                },
+              };
+              setLoadingSubmit(true);
                   const result = await reload(requestOptions);
                   return result;
-                }}
-              />
+            }}
+          />
             </div>
             <div className="mt-4 p-4">
-              <ChatBottombar
-                input={input}
-                handleInputChange={handleInputChange}
-                handleSubmit={onSubmit}
-                isLoading={isLoading}
-                stop={handleStop}
-                setInput={setInput}
-              />
+          <ChatBottombar
+            input={input}
+            handleInputChange={handleInputChange}
+            handleSubmit={onSubmit}
+            isLoading={isLoading}
+            stop={handleStop}
+            setInput={setInput}
+          />
             </div>
           </div>
-        )}
+      )}
       </div>
     </div>
   );
