@@ -89,5 +89,9 @@ export function savePet(pet: {
   }
 }
 
+export async function fetchStatus() {
+  return { status: 'ok', timestamp: new Date().toISOString() };
+}
+
 // For compatibility
 export { loadPets as getAllPets };
