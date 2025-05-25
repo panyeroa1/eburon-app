@@ -56,6 +56,7 @@ jobs:
             echo "OLLAMA_URL=http://${{ secrets.EC2_HOST }}:11434" > .env.local
             echo "NODE_ENV=production" >> .env.local
             echo "PETS_JSON_PATH=./data/pets.json" >> .env.local
+            echo "AWS_REGION=us-east-2" >> .env.local
 
             npm ci
             npm run build
