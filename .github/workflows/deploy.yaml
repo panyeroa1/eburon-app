@@ -60,10 +60,12 @@ jobs:
             fi
             chmod 664 data/pets.json
 
-            # Create or overwrite .env file (safe heredoc inside heredoc)
+            # Create or overwrite .env file with S3 + region
             echo "OLLAMA_URL=http://${{ secrets.EC2_HOST }}:11434" > .env
             echo "NODE_ENV=production" >> .env
             echo "PETS_JSON_PATH=./data/pets.json" >> .env
+            echo "S3_BUCKET=m-adoption-images" >> .env
+            echo "AWS_REGION=us-east-2" >> .env
 
             # Install dependencies and build
             npm ci
