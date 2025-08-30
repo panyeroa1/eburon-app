@@ -30,6 +30,7 @@ interface Actions {
   saveMessagesToDB: (chatId: string, messages: Message[]) => Promise<void>;
   loadChatsFromDB: () => Promise<void>;
   createNewChat: (title?: string) => Promise<string>;
+  addChat: (chatId: string, chat: ChatSession) => void;
   handleDelete: (chatId: string, messageId?: string) => void;
   setUserName: (userName: string) => void;
   startDownload: (modelName: string) => void;
@@ -140,8 +141,20 @@ const useChatStore = create<State & Actions>()(
 
       createNewChat: async (title) => {
         const { token } = useAuthStore.getState();
+        
         if (!token) {
           const chatId = generateId();
+          // Add chat to local state for guest users
+          set((state) => ({
+            chats: {
+              ...state.chats,
+              [chatId]: {
+                messages: [],
+                createdAt: new Date().toISOString(),
+                title: title || 'New Chat',
+              },
+            },
+          }));
           return chatId;
         }
 
@@ -160,10 +173,34 @@ const useChatStore = create<State & Actions>()(
           }
 
           const { chat } = await response.json();
+          
+          // Add chat to local state for authenticated users
+          set((state) => ({
+            chats: {
+              ...state.chats,
+              [chat.id]: {
+                messages: chat.messages || [],
+                createdAt: chat.createdAt,
+                title: chat.title,
+              },
+            },
+          }));
+          
           return chat.id;
         } catch (error) {
           console.error('Error creating chat in database:', error);
           const chatId = generateId();
+          // Fallback: add to local state
+          set((state) => ({
+            chats: {
+              ...state.chats,
+              [chatId]: {
+                messages: [],
+                createdAt: new Date().toISOString(),
+                title: title || 'New Chat',
+              },
+            },
+          }));
           return chatId;
         }
       },
@@ -207,6 +244,15 @@ const useChatStore = create<State & Actions>()(
             chats: remainingChats,
           };
         });
+      },
+
+      addChat: (chatId, chat) => {
+        set((state) => ({
+          chats: {
+            ...state.chats,
+            [chatId]: chat,
+          },
+        }));
       },
 
       clearChats: () => {
