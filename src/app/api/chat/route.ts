@@ -8,6 +8,10 @@ export async function POST(req: Request) {
   // Destructure request data
   const { messages, selectedModel, data } = await req.json();
 
+  console.log('API Route - Selected model:', selectedModel);
+  console.log('API Route - Has images:', !!data?.images?.length);
+  console.log('API Route - Number of images:', data?.images?.length || 0);
+
   const ollamaUrl = process.env.OLLAMA_URL;
 
   const initialMessages = messages.slice(0, -1); 
@@ -19,22 +23,48 @@ export async function POST(req: Request) {
   const messageContent: UserContent = [{ type: 'text', text: currentMessage.content }];
 
   // Add images if they exist (base64 images from the frontend)
-  data?.images?.forEach((imageUrl: string) => {
-    // For base64 images, we need to pass them directly, not as URL objects
-    messageContent.push({ 
-      type: 'image', 
-      image: imageUrl // Pass the base64 string directly
+  if (data?.images?.length > 0) {
+    console.log('API Route - Processing images for model:', selectedModel);
+    data.images.forEach((imageUrl: string, index: number) => {
+      console.log(`API Route - Adding image ${index + 1}, length: ${imageUrl.length}`);
+      // For base64 images, we need to pass them directly, not as URL objects
+      messageContent.push({ 
+        type: 'image', 
+        image: imageUrl // Pass the base64 string directly
+      });
     });
-  });
+  }
 
   // Stream text using the ollama model
-  const result = await streamText({
-    model: ollama(selectedModel),
-    messages: [
-      ...convertToCoreMessages(initialMessages),
-      { role: 'user', content: messageContent },
-    ],
-  });
+  try {
+    console.log('API Route - Sending request to Ollama with content types:', 
+      messageContent.map(item => item.type).join(', '));
+    
+    const result = await streamText({
+      model: ollama(selectedModel),
+      messages: [
+        ...convertToCoreMessages(initialMessages),
+        { role: 'user', content: messageContent },
+      ],
+    });
 
-  return result.toDataStreamResponse();
+    return result.toDataStreamResponse();
+  } catch (error) {
+    console.error('API Route - Error with model:', selectedModel, error);
+    
+    // Check if it's an image-related error with a non-vision model
+    if (data?.images?.length > 0 && error instanceof Error && error.message?.includes('vision')) {
+      return new Response(
+        JSON.stringify({ 
+          error: `Model "${selectedModel}" does not support images. Please use a vision-capable model like "llava" or "llava:latest".` 
+        }), 
+        { 
+          status: 400, 
+          headers: { 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+    
+    throw error;
+  }
 }

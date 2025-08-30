@@ -79,6 +79,27 @@ export default function ChatBottombar({
   return (
     <div className="px-4 pb-7 flex justify-between w-full items-center relative ">
       <AnimatePresence initial={false}>
+        {/* Warning for non-vision models with images */}
+        {base64Images && base64Images.length > 0 && selectedModel && (
+          (() => {
+            const visionModels = ['llava', 'bakllava', 'llava-phi3', 'moondream'];
+            const isVisionModel = visionModels.some(model => 
+              selectedModel.toLowerCase().includes(model.toLowerCase())
+            );
+            
+            if (!isVisionModel) {
+              return (
+                <div className="w-full mb-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                  <p className="text-amber-800 dark:text-amber-200 text-sm">
+                    ⚠️ Model "{selectedModel}" doesn't support images. Please select a vision model like "llava" to process images.
+                  </p>
+                </div>
+              );
+            }
+            return null;
+          })()
+        )}
+        
         <form
           onSubmit={handleSubmit}
           className="w-full items-center flex flex-col  bg-accent dark:bg-card rounded-lg "

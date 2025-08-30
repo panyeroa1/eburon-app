@@ -81,6 +81,19 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
       return;
     }
 
+    // Check if images are uploaded but model doesn't support vision
+    if (base64Images && base64Images.length > 0) {
+      const visionModels = ['llava', 'bakllava', 'llava-phi3', 'llava:latest', 'moondream'];
+      const isVisionModel = visionModels.some(model => 
+        selectedModel.toLowerCase().includes(model.toLowerCase())
+      );
+      
+      if (!isVisionModel) {
+        toast.error(`Model "${selectedModel}" doesn't support images. Please select a vision model like "llava".`);
+        return;
+      }
+    }
+
     const attachments: Attachment[] = base64Images
       ? base64Images.map((image) => ({
           contentType: "image/base64",
