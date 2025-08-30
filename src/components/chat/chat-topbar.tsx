@@ -99,18 +99,30 @@ export default function ChatTopbar({
         </PopoverTrigger>
         <PopoverContent className="w-[300px] p-1">
           {models.length > 0 ? (
-            models.map((model) => (
-              <Button
-                key={model}
-                variant="ghost"
-                className="w-full"
-                onClick={() => {
-                  handleModelChange(model);
-                }}
-              >
-                {model}
-              </Button>
-            ))
+            models.map((model) => {
+              const visionModels = ['llava', 'bakllava', 'llava-phi3', 'moondream'];
+              const isVisionModel = visionModels.some(visionModel => 
+                model.toLowerCase().includes(visionModel.toLowerCase())
+              );
+              
+              return (
+                <Button
+                  key={model}
+                  variant="ghost"
+                  className="w-full justify-between"
+                  onClick={() => {
+                    handleModelChange(model);
+                  }}
+                >
+                  <span>{model}</span>
+                  {isVisionModel && (
+                    <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">
+                      Vision
+                    </span>
+                  )}
+                </Button>
+              );
+            })
           ) : (
             <Button variant="ghost" disabled className=" w-full">
               No models available

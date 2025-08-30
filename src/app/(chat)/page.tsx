@@ -10,21 +10,26 @@ import {
 } from "@/components/ui/dialog";
 import UsernameForm from "@/components/username-form";
 import { generateUUID } from "@/lib/utils";
-import React from "react";
+import React, { useEffect } from "react";
 import useChatStore from "../hooks/useChatStore";
+import useAuthStore from "../hooks/useAuthStore";
 
 export default function Home() {
   const id = generateUUID();
   const [open, setOpen] = React.useState(false);
+  
   const userName = useChatStore((state) => state.userName);
   const setUserName = useChatStore((state) => state.setUserName);
+  const { isAuthenticated, user } = useAuthStore();
 
   const onOpenChange = (isOpen: boolean) => {
-    if (userName) return setOpen(isOpen);
+    if (userName || isAuthenticated) return setOpen(isOpen);
 
     setUserName("Anonymous");
     setOpen(isOpen);
   };
+
+  // Removed automatic chat creation - users can create chats using "New Chat" button
 
   return (
     <main className="flex h-[calc(100dvh)] flex-col items-center ">

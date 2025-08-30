@@ -91,7 +91,7 @@ export function ChatLayout({
       </ResizablePanel>
       <ResizableHandle className={cn("hidden md:flex")} withHandle />
       <ResizablePanel
-        className="h-full w-full flex justify-center"
+        className="h-full w-full flex justify-center text-sm"
         defaultSize={defaultLayout[1]}
       >
         <Chat id={id} initialMessages={initialMessages} isMobile={isMobile} />

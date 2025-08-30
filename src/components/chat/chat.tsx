@@ -11,8 +11,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import useChatStore from "@/app/hooks/useChatStore";
+import useAuthStore from "@/app/hooks/useAuthStore";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import WelcomeCard from "../welcome-card";
 
 export interface ChatProps {
   id: string;
@@ -41,7 +43,15 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     },
     onFinish: (message) => {
       const savedMessages = getMessagesById(id);
-      saveMessages(id, [...savedMessages, message]);
+      const allMessages = [...savedMessages, message];
+      saveMessages(id, allMessages);
+      
+      // Save to database if user is authenticated
+      const { isAuthenticated } = useAuthStore.getState();
+      if (isAuthenticated) {
+        saveMessagesToDB(id, allMessages);
+      }
+      
       setLoadingSubmit(false);
       router.replace(`/c/${id}`);
     },
@@ -58,6 +68,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
   const setBase64Images = useChatStore((state) => state.setBase64Images);
   const selectedModel = useChatStore((state) => state.selectedModel);
   const saveMessages = useChatStore((state) => state.saveMessages);
+  const saveMessagesToDB = useChatStore((state) => state.saveMessagesToDB);
   const getMessagesById = useChatStore((state) => state.getMessagesById);
   const router = useRouter();
 
@@ -70,13 +81,18 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
       return;
     }
 
-    const userMessage: Message = {
-      id: generateId(),
-      role: "user",
-      content: input,
-    };
-
-    setLoadingSubmit(true);
+    // Check if images are uploaded but model doesn't support vision
+    if (base64Images && base64Images.length > 0) {
+      const visionModels = ['llava', 'bakllava', 'llava-phi3', 'llava:latest', 'moondream'];
+      const isVisionModel = visionModels.some(model => 
+        selectedModel.toLowerCase().includes(model.toLowerCase())
+      );
+      
+      if (!isVisionModel) {
+        toast.error(`Model "${selectedModel}" doesn't support images. Please select a vision model like "llava".`);
+        return;
+      }
+    }
 
     const attachments: Attachment[] = base64Images
       ? base64Images.map((image) => ({
@@ -84,6 +100,17 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
           url: image,
         }))
       : [];
+
+    const userMessage: Message = {
+      id: generateId(),
+      role: "user",
+      content: input,
+      ...(attachments.length > 0 && {
+        experimental_attachments: attachments,
+      }),
+    };
+
+    setLoadingSubmit(true);
 
     const requestOptions: ChatRequestOptions = {
       body: {
@@ -97,9 +124,18 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
       }),
     };
 
-    handleSubmit(e, requestOptions);
-    saveMessages(id, [...messages, userMessage]);
+    // Clear images immediately after creating the message but before sending
     setBase64Images(null);
+    
+    handleSubmit(e, requestOptions);
+    const allMessages = [...messages, userMessage];
+    saveMessages(id, allMessages);
+    
+    // Save to database if user is authenticated
+    const { isAuthenticated } = useAuthStore.getState();
+    if (isAuthenticated) {
+      saveMessagesToDB(id, allMessages);
+    }
   };
 
   const removeLatestMessage = () => {
@@ -116,7 +152,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
   };
 
   return (
-    <div className="flex flex-col w-full max-w-3xl h-full">
+    <div className="flex flex-col w-full h-full">
       <ChatTopbar
         isLoading={isLoading}
         chatId={id}
@@ -125,7 +161,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
       />
 
       {messages.length === 0 ? (
-        <div className="flex flex-col h-full w-full items-center gap-4 justify-center">
+        <div className="flex flex-col h-full w-full items-center gap-6 justify-center">
           <Image
             src="/ollama.png"
             alt="AI"
@@ -136,6 +172,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
           <p className="text-center text-base text-muted-foreground">
             How can I help you today?
           </p>
+          <WelcomeCard />
           <ChatBottombar
             input={input}
             handleInputChange={handleInputChange}

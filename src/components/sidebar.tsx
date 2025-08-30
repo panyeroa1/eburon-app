@@ -28,6 +28,7 @@ import {
 import { TrashIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
 import useChatStore from "@/app/hooks/useChatStore";
+import useAuthStore from "@/app/hooks/useAuthStore";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -49,6 +50,21 @@ export function Sidebar({
 
   const chats = useChatStore((state) => state.chats);
   const handleDelete = useChatStore((state) => state.handleDelete);
+  const createNewChat = useChatStore((state) => state.createNewChat);
+  const { isAuthenticated, isLoading } = useAuthStore();
+
+  const handleNewChat = async () => {
+    if (isAuthenticated) {
+      const newChatId = await createNewChat();
+      router.push(`/c/${newChatId}`);
+    } else {
+      router.push("/");
+    }
+    
+    if (closeSidebar) {
+      closeSidebar();
+    }
+  };
 
   return (
     <div
@@ -57,12 +73,7 @@ export function Sidebar({
     >
       <div className=" flex flex-col justify-between p-2 max-h-fit overflow-y-auto">
         <Button
-          onClick={() => {
-            router.push("/");
-            if (closeSidebar) {
-              closeSidebar();
-            }
-          }}
+          onClick={handleNewChat}
           variant="ghost"
           className="flex justify-between w-full h-14 text-sm xl:text-lg font-normal items-center "
         >
@@ -82,9 +93,14 @@ export function Sidebar({
         </Button>
 
         <div className="flex flex-col pt-10 gap-2">
-          <p className="pl-4 text-xs text-muted-foreground">Your chats</p>
-          <Suspense fallback>
-            {chats &&
+          <p className="pl-4 text-xs text-muted-foreground">
+            {isAuthenticated ? "Your chats" : "Local chats"}
+          </p>
+          <Suspense fallback={<SidebarSkeleton />}>
+            {isLoading ? (
+              <SidebarSkeleton />
+            ) : (
+              chats &&
               Object.entries(chats)
                 .sort(
                   ([, a], [, b]) =>
@@ -109,7 +125,7 @@ export function Sidebar({
                         <span className="text-xs font-normal ">
                           {chat.messages.length > 0
                             ? chat.messages[0].content
-                            : ""}
+                            : chat.title || "New Chat"}
                         </span>
                       </div>
                     </div>
@@ -161,7 +177,8 @@ export function Sidebar({
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </Link>
-                ))}
+                ))
+            )}
           </Suspense>
         </div>
       </div>
