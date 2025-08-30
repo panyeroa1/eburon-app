@@ -14,6 +14,7 @@ import useChatStore from "@/app/hooks/useChatStore";
 import useAuthStore from "@/app/hooks/useAuthStore";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import WelcomeCard from "../welcome-card";
 
 export interface ChatProps {
   id: string;
@@ -143,7 +144,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
       />
 
       {messages.length === 0 ? (
-        <div className="flex flex-col h-full w-full items-center gap-4 justify-center">
+        <div className="flex flex-col h-full w-full items-center gap-6 justify-center">
           <Image
             src="/ollama.png"
             alt="AI"
@@ -154,6 +155,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
           <p className="text-center text-base text-muted-foreground">
             How can I help you today?
           </p>
+          <WelcomeCard />
           <ChatBottombar
             input={input}
             handleInputChange={handleInputChange}

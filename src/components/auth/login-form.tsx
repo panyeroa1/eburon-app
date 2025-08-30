@@ -41,7 +41,7 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
       }
 
       login(data.token, data.user);
-      toast.success("Login successful!");
+      toast.success("Login successful! Loading your chats...");
       router.push("/");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Login failed");

@@ -43,6 +43,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           
           // Load chats from database
           await loadChatsFromDB();
+          toast.success('Welcome back! Your chats have been loaded.');
         } catch (error) {
           console.error('Auth initialization error:', error);
           authLogout();

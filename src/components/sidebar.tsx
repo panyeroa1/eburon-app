@@ -51,7 +51,7 @@ export function Sidebar({
   const chats = useChatStore((state) => state.chats);
   const handleDelete = useChatStore((state) => state.handleDelete);
   const createNewChat = useChatStore((state) => state.createNewChat);
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, isLoading } = useAuthStore();
 
   const handleNewChat = async () => {
     if (isAuthenticated) {
@@ -93,9 +93,14 @@ export function Sidebar({
         </Button>
 
         <div className="flex flex-col pt-10 gap-2">
-          <p className="pl-4 text-xs text-muted-foreground">Your chats</p>
-          <Suspense fallback>
-            {chats &&
+          <p className="pl-4 text-xs text-muted-foreground">
+            {isAuthenticated ? "Your chats" : "Local chats"}
+          </p>
+          <Suspense fallback={<SidebarSkeleton />}>
+            {isLoading ? (
+              <SidebarSkeleton />
+            ) : (
+              chats &&
               Object.entries(chats)
                 .sort(
                   ([, a], [, b]) =>
@@ -172,7 +177,8 @@ export function Sidebar({
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </Link>
-                ))}
+                ))
+            )}
           </Suspense>
         </div>
       </div>
