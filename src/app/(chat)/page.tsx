@@ -17,9 +17,9 @@ import useAuthStore from "../hooks/useAuthStore";
 export default function Home() {
   const id = generateUUID();
   const [open, setOpen] = React.useState(false);
+  
   const userName = useChatStore((state) => state.userName);
   const setUserName = useChatStore((state) => state.setUserName);
-  const createNewChat = useChatStore((state) => state.createNewChat);
   const { isAuthenticated, user } = useAuthStore();
 
   const onOpenChange = (isOpen: boolean) => {
@@ -29,12 +29,7 @@ export default function Home() {
     setOpen(isOpen);
   };
 
-  // Create a new chat for authenticated users
-  useEffect(() => {
-    if (isAuthenticated) {
-      createNewChat();
-    }
-  }, [isAuthenticated, createNewChat]);
+  // Removed automatic chat creation - users can create chats using "New Chat" button
 
   return (
     <main className="flex h-[calc(100dvh)] flex-col items-center ">

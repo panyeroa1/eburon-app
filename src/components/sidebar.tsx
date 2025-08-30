@@ -125,7 +125,7 @@ export function Sidebar({
                         <span className="text-xs font-normal ">
                           {chat.messages.length > 0
                             ? chat.messages[0].content
-                            : ""}
+                            : chat.title || "New Chat"}
                         </span>
                       </div>
                     </div>
