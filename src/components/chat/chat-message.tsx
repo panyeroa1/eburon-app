@@ -91,10 +91,38 @@ function ChatMessage({ message, isLast, isLoading, reload }: ChatMessageProps) {
     )
   );
 
+  const markdownComponents = {
+    p: ({ children }: any) => (
+      <p className="mb-0.5 last:mb-0">{children}</p>
+    ),
+    table: ({ children }: any) => (
+      <div className="w-full overflow-x-auto my-2">
+        <table className="min-w-full border text-sm bg-background">
+          {children}
+        </table>
+      </div>
+    ),
+    th: ({ children }: any) => (
+      <th className="border px-3 py-2 bg-muted text-left font-semibold">{children}</th>
+    ),
+    td: ({ children }: any) => (
+      <td className="border px-3 py-2 align-top">{children}</td>
+    ),
+    tr: ({ children }: any) => (
+      <tr className="even:bg-muted/50">{children}</tr>
+    ),
+  };
+
   const renderContent = () => (
     contentParts.map((part, index) => (
       index % 2 === 0 ? (
-        <Markdown key={index} remarkPlugins={[remarkGfm]}>{part}</Markdown>
+        <Markdown
+          key={index}
+          remarkPlugins={[remarkGfm]}
+          components={markdownComponents}
+        >
+          {part}
+        </Markdown>
       ) : (
         <pre className="whitespace-pre-wrap" key={index}>
           <CodeDisplayBlock code={part} />

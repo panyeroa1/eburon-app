@@ -16,7 +16,7 @@ export default function Page({ params }: { params: { id: string } }) {
   }
 
   return (
-    <main className="flex h-[calc(100dvh)] flex-col items-center ">
+    <main className="flex h-[calc(100dvh)] flex-col items-center  ">
       <ChatLayout
         key={id}
         id={id}
