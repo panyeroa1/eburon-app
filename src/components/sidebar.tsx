@@ -28,6 +28,7 @@ import {
 import { TrashIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
 import useChatStore from "@/app/hooks/useChatStore";
+import useAuthStore from "@/app/hooks/useAuthStore";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -49,6 +50,21 @@ export function Sidebar({
 
   const chats = useChatStore((state) => state.chats);
   const handleDelete = useChatStore((state) => state.handleDelete);
+  const createNewChat = useChatStore((state) => state.createNewChat);
+  const { isAuthenticated } = useAuthStore();
+
+  const handleNewChat = async () => {
+    if (isAuthenticated) {
+      const newChatId = await createNewChat();
+      router.push(`/c/${newChatId}`);
+    } else {
+      router.push("/");
+    }
+    
+    if (closeSidebar) {
+      closeSidebar();
+    }
+  };
 
   return (
     <div
@@ -57,12 +73,7 @@ export function Sidebar({
     >
       <div className=" flex flex-col justify-between p-2 max-h-fit overflow-y-auto">
         <Button
-          onClick={() => {
-            router.push("/");
-            if (closeSidebar) {
-              closeSidebar();
-            }
-          }}
+          onClick={handleNewChat}
           variant="ghost"
           className="flex justify-between w-full h-14 text-sm xl:text-lg font-normal items-center "
         >

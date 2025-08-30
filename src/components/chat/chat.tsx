@@ -11,6 +11,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import useChatStore from "@/app/hooks/useChatStore";
+import useAuthStore from "@/app/hooks/useAuthStore";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -41,7 +42,15 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     },
     onFinish: (message) => {
       const savedMessages = getMessagesById(id);
-      saveMessages(id, [...savedMessages, message]);
+      const allMessages = [...savedMessages, message];
+      saveMessages(id, allMessages);
+      
+      // Save to database if user is authenticated
+      const { isAuthenticated } = useAuthStore.getState();
+      if (isAuthenticated) {
+        saveMessagesToDB(id, allMessages);
+      }
+      
       setLoadingSubmit(false);
       router.replace(`/c/${id}`);
     },
@@ -58,6 +67,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
   const setBase64Images = useChatStore((state) => state.setBase64Images);
   const selectedModel = useChatStore((state) => state.selectedModel);
   const saveMessages = useChatStore((state) => state.saveMessages);
+  const saveMessagesToDB = useChatStore((state) => state.saveMessagesToDB);
   const getMessagesById = useChatStore((state) => state.getMessagesById);
   const router = useRouter();
 
@@ -98,7 +108,15 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     };
 
     handleSubmit(e, requestOptions);
-    saveMessages(id, [...messages, userMessage]);
+    const allMessages = [...messages, userMessage];
+    saveMessages(id, allMessages);
+    
+    // Save to database if user is authenticated
+    const { isAuthenticated } = useAuthStore.getState();
+    if (isAuthenticated) {
+      saveMessagesToDB(id, allMessages);
+    }
+    
     setBase64Images(null);
   };
 
