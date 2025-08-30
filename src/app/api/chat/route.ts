@@ -18,10 +18,13 @@ export async function POST(req: Request) {
   // Build message content array directly
   const messageContent: UserContent = [{ type: 'text', text: currentMessage.content }];
 
-  // Add images if they exist
+  // Add images if they exist (base64 images from the frontend)
   data?.images?.forEach((imageUrl: string) => {
-    const image = new URL(imageUrl);
-    messageContent.push({ type: 'image', image });
+    // For base64 images, we need to pass them directly, not as URL objects
+    messageContent.push({ 
+      type: 'image', 
+      image: imageUrl // Pass the base64 string directly
+    });
   });
 
   // Stream text using the ollama model

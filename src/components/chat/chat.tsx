@@ -81,20 +81,23 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
       return;
     }
 
-    const userMessage: Message = {
-      id: generateId(),
-      role: "user",
-      content: input,
-    };
-
-    setLoadingSubmit(true);
-
     const attachments: Attachment[] = base64Images
       ? base64Images.map((image) => ({
           contentType: "image/base64",
           url: image,
         }))
       : [];
+
+    const userMessage: Message = {
+      id: generateId(),
+      role: "user",
+      content: input,
+      ...(attachments.length > 0 && {
+        experimental_attachments: attachments,
+      }),
+    };
+
+    setLoadingSubmit(true);
 
     const requestOptions: ChatRequestOptions = {
       body: {
