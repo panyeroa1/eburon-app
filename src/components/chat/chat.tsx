@@ -124,6 +124,9 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
       }),
     };
 
+    // Clear images immediately after creating the message but before sending
+    setBase64Images(null);
+    
     handleSubmit(e, requestOptions);
     const allMessages = [...messages, userMessage];
     saveMessages(id, allMessages);
@@ -133,8 +136,6 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     if (isAuthenticated) {
       saveMessagesToDB(id, allMessages);
     }
-    
-    setBase64Images(null);
   };
 
   const removeLatestMessage = () => {

@@ -27,10 +27,22 @@ export async function POST(req: Request) {
     console.log('API Route - Processing images for model:', selectedModel);
     data.images.forEach((imageUrl: string, index: number) => {
       console.log(`API Route - Adding image ${index + 1}, length: ${imageUrl.length}`);
-      // For base64 images, we need to pass them directly, not as URL objects
+      
+      // Strip data URL prefix if present (data:image/png;base64,)
+      let base64Data = imageUrl;
+      if (imageUrl.startsWith('data:')) {
+        const base64Index = imageUrl.indexOf('base64,');
+        if (base64Index !== -1) {
+          base64Data = imageUrl.substring(base64Index + 7);
+        }
+      }
+      
+      console.log(`API Route - Processed image ${index + 1}, base64 length: ${base64Data.length}`);
+      
+      // For base64 images, we need to pass them as base64 strings
       messageContent.push({ 
         type: 'image', 
-        image: imageUrl // Pass the base64 string directly
+        image: base64Data // Pass the clean base64 string
       });
     });
   }
@@ -52,6 +64,12 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('API Route - Error with model:', selectedModel, error);
     
+    // Log the full error for debugging
+    if (error instanceof Error) {
+      console.error('API Route - Error message:', error.message);
+      console.error('API Route - Error stack:', error.stack);
+    }
+    
     // Check if it's an image-related error with a non-vision model
     if (data?.images?.length > 0 && error instanceof Error && error.message?.includes('vision')) {
       return new Response(
@@ -65,6 +83,15 @@ export async function POST(req: Request) {
       );
     }
     
-    throw error;
+    // Generic error response
+    return new Response(
+      JSON.stringify({ 
+        error: `Error processing request: ${error instanceof Error ? error.message : 'Unknown error'}` 
+      }), 
+      { 
+        status: 500, 
+        headers: { 'Content-Type': 'application/json' } 
+      }
+    );
   }
 }
